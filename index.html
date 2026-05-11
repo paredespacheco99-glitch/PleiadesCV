@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PleiadesCV - Generador con IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        
+        @media print {
+            header, #panel-izquierdo, .vista-previa-badge { display: none !important; }
+            #panel-derecho { width: 100% !important; padding: 0 !important; background: white !important; align-items: flex-start !important; }
+            #resume-document { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#f8fafc] text-[#1e293b] flex flex-col h-screen overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md px-6 flex items-center justify-between z-10 shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <span class="font-bold text-xl tracking-tight text-slate-800">Pleiades<span class="text-indigo-600">CV</span></span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <button onclick="togglePanel()" class="flex items-center gap-2 px-4 py-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-full transition-colors font-bold text-sm">
+                <i data-lucide="layout-panel-left" class="w-4 h-4"></i> <span id="textToggle">Ocultar Editor</span>
+            </button>
+
+            <button onclick="window.print()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full shadow-md shadow-indigo-100 transition-all font-semibold text-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Exportar PDF
+            </button>
+        </div>
+    </header>
+
+    <main class="flex flex-1 overflow-hidden transition-all duration-300">
+        <!-- PANEL IZQUIERDO -->
+        <section id="panel-izquierdo" class="w-[45%] bg-[#f1f5f9] border-r border-slate-200 h-full relative transition-all duration-300">
+            <div class="h-full overflow-y-auto custom-scrollbar p-8 pb-32 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="user" class="w-5 h-5"></i></div>
+                        <h3 class="font-bold text-slate-800 uppercase tracking-wider text-xs">Datos de Contacto</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="inputName" oninput="actualizarPrevio()" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100" placeholder="Nombre Completo" value="Tu Nombre">
+                        <input id="inputTitle" oninput="actualizarPrevio()" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100" placeholder="Título Profesional" value="Tu Profesión">
+                        <input id="inputEmail" oninput="actualizarPrevio()" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100" placeholder="Correo electrónico" value="correo@ejemplo.com">
+                        <input id="inputPhone" oninput="actualizarPrevio()" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100" placeholder="Teléfono" value="+1 234 567 8900">
+                        <input id="inputLocation" oninput="actualizarPrevio()" class="col-span-2 w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100" placeholder="Ubicación (Ej. Ciudad, País)" value="Ciudad, País">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-indigo-100 ring-1 ring-indigo-50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-10 opacity-50"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-600 text-white rounded-lg shadow-md shadow-indigo-200">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 uppercase tracking-wider text-xs">El Cerebro de IA</h3>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Pega aquí toda tu experiencia. Recuerda mencionar nombres de empresas o si trabajaste como independiente.</p>
+                    <textarea id="textoDesorganizado" rows="6" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all text-sm resize-none mb-2" placeholder="Ej: Trabajé de forma independiente arreglando computadoras..."></textarea>
+                </div>
+            </div>
+
+            <!-- Botón Flotante -->
+            <div class="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-[#f1f5f9] via-[#f1f5f9] to-transparent pointer-events-none">
+                <button id="btnGenerar" onclick="generarCV()" class="pointer-events-auto w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-4 rounded-xl shadow-[0_10px_20px_rgba(0,0,0,0.15)] transition-all font-bold text-sm">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> <span id="btnText">GENERAR CV ESTRUCTURADO</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANEL DERECHO -->
+        <section id="panel-derecho" class="w-[55%] bg-slate-200/50 flex flex-col items-center p-8 overflow-y-auto relative custom-scrollbar transition-all duration-300">
+            <div class="vista-previa-badge absolute top-6 right-8 flex bg-white/80 backdrop-blur rounded-full px-4 py-2 shadow-sm border border-slate-200 z-10 gap-4">
+                <div class="flex items-center gap-2 text-slate-400">
+                    <i data-lucide="eye" class="w-4 h-4"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-500">Vista Previa</span>
+                </div>
+            </div>
+
+            <!-- CV Canvas -->
+            <div id="resume-document" class="w-[8.5in] min-h-[11in] h-fit bg-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2px] flex flex-col transform origin-top mb-12">
+                
+                <!-- Header del Template -->
+                <div class="p-10 pb-8 border-b-2 border-slate-100 bg-[#1e293b] text-white">
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-1">
+                            <h1 id="previewName" class="text-4xl font-black tracking-tight uppercase leading-tight">Tu Nombre</h1>
+                            <p id="previewTitle" class="text-indigo-400 font-bold text-lg tracking-wide uppercase">Tu Profesión</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-1.5 text-[11px] font-medium text-slate-300">
+                            <span class="flex items-center gap-2"><span id="previewLocation">Ciudad, País</span> <i data-lucide="map-pin" class="w-3 h-3 text-indigo-400"></i></span>
+                            <span class="flex items-center gap-2"><span id="previewPhone">+1 234 567 8900</span> <i data-lucide="phone" class="w-3 h-3 text-indigo-400"></i></span>
+                            <span class="flex items-center gap-2"><span id="previewEmail">correo@ejemplo.com</span> <i data-lucide="mail" class="w-3 h-3 text-indigo-400"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-1">
+                    <!-- Columna Izquierda: AMPLIADA A 42% PARA DAR MÁS ESPACIO AL PERFIL -->
+                    <div class="w-[42%] bg-slate-50/50 p-8 space-y-8 border-r border-slate-100">
+                        <section>
+                            <h4 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 pb-2 border-b border-slate-200">Perfil Profesional</h4>
+                            <!-- Eliminado el text-justify, ahora es text-left explícito y text-sm -->
+                            <p id="previewSummary" class="text-slate-600 text-sm leading-relaxed text-left">
+                                Esperando que la inteligencia artificial analice y redacte tu perfil profesional...
+                            </p>
+                        </section>
+
+                        <section>
+                            <h4 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 pb-2 border-b border-slate-200">Educación</h4>
+                            <div id="previewEducation" class="space-y-4">
+                                <span class="text-xs text-slate-400">Sin registros</span>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Columna Derecha -->
+                    <div class="flex-1 p-8 space-y-8 min-w-0">
+                        <section>
+                            <h4 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-5 pb-2 border-b border-slate-200">Experiencia Profesional</h4>
+                            <div id="previewExperience" class="space-y-6">
+                                <div class="text-sm text-slate-400 italic">Genera el CV para ver tu experiencia estructurada.</div>
+                            </div>
+                        </section>
+
+                        <section id="previewSkillsSection" class="hidden">
+                            <h4 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-5 pb-2 border-b border-slate-200">Habilidades & Competencias</h4>
+                            <div class="mb-5">
+                                <div class="text-[10px] font-black text-slate-400 uppercase mb-3">Técnicas (Hard Skills)</div>
+                                <div id="previewHardSkills" class="flex flex-wrap gap-1.5"></div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] font-black text-slate-400 uppercase mb-3">Blandas (Soft Skills)</div>
+                                <div id="previewSoftSkills" class="flex flex-wrap gap-1.5"></div>
+                            </div>
+                        </section>
+                        
+                        <div id="atsBadge" class="hidden pt-6 flex items-center justify-between">
+                            <div class="flex gap-1">
+                                <i data-lucide="check-circle-2" class="w-3 h-3 text-indigo-600"></i>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Optimizado para ATS</span>
+                            </div>
+                            <span class="text-[9px] font-medium text-slate-300">Impulsado por Gemini 2.5 Flash</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Script de lógica -->
+    <script>
+        lucide.createIcons();
+
+        function togglePanel() {
+            const panelIzq = document.getElementById('panel-izquierdo');
+            const panelDer = document.getElementById('panel-derecho');
+            const textToggle = document.getElementById('textToggle');
+
+            if (panelIzq.classList.contains('hidden')) {
+                panelIzq.classList.remove('hidden');
+                panelDer.classList.remove('w-full');
+                panelDer.classList.add('w-[55%]');
+                textToggle.innerText = "Ocultar Editor";
+            } else {
+                panelIzq.classList.add('hidden');
+                panelDer.classList.remove('w-[55%]');
+                panelDer.classList.add('w-full');
+                textToggle.innerText = "Mostrar Editor";
+            }
+        }
+
+        function actualizarPrevio() {
+            document.getElementById('previewName').innerText = document.getElementById('inputName').value || 'Tu Nombre';
+            document.getElementById('previewTitle').innerText = document.getElementById('inputTitle').value || 'Tu Profesión';
+            document.getElementById('previewEmail').innerText = document.getElementById('inputEmail').value || 'correo@ejemplo.com';
+            document.getElementById('previewPhone').innerText = document.getElementById('inputPhone').value || '+1 234 567 8900';
+            document.getElementById('previewLocation').innerText = document.getElementById('inputLocation').value || 'Ciudad, País';
+        }
+
+        async function generarCV() {
+            const texto = document.getElementById('textoDesorganizado').value;
+            const btn = document.getElementById('btnGenerar');
+            const btnText = document.getElementById('btnText');
+
+            if (!texto.trim()) {
+                alert("Por favor, ingresa tu experiencia primero.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.classList.add('bg-slate-400', 'cursor-not-allowed');
+            btn.classList.remove('bg-slate-900', 'hover:bg-slate-800');
+            btnText.innerText = "Analizando y Optimizando...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:8080/api/generar-cv', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texto_desorganizado: texto })
+                });
+
+                if (!response.ok) throw new Error("Error en la API");
+                
+                const cvData = await response.json();
+                renderizarJSONenHTML(cvData);
+
+            } catch (error) {
+                console.error(error);
+                alert("Hubo un error. Asegúrate de que el servidor Uvicorn esté corriendo en la terminal.");
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-400', 'cursor-not-allowed');
+                btn.classList.add('bg-slate-900', 'hover:bg-slate-800');
+                btnText.innerText = "GENERAR CV ESTRUCTURADO";
+            }
+        }
+
+        function renderizarJSONenHTML(cv) {
+            document.getElementById('previewSummary').innerText = cv.perfil_profesional || "Perfil generado...";
+
+            let eduHtml = '<span class="text-xs text-slate-400">Sin registros</span>';
+            if (Array.isArray(cv.educacion)) {
+                eduHtml = cv.educacion.map(edu => `
+                    <div>
+                        <div class="text-xs font-black text-slate-800 leading-tight">${edu.titulo || 'Estudio'}</div>
+                        <div class="text-[11px] font-bold text-indigo-600 my-0.5">${edu.institucion || 'Institución no especificada'}</div>
+                        <div class="text-[10px] font-medium text-slate-400">${edu.fecha_graduacion || ''}</div>
+                    </div>
+                `).join('');
+            } else if (typeof cv.educacion === 'string') {
+                eduHtml = `<div class="text-xs font-black text-slate-800">${cv.educacion}</div>`;
+            }
+            document.getElementById('previewEducation').innerHTML = eduHtml;
+
+            let expHtml = '<div class="text-sm text-slate-400 italic">Genera el CV para ver tu experiencia...</div>';
+            if (Array.isArray(cv.experiencia_laboral)) {
+                expHtml = cv.experiencia_laboral.map(exp => {
+                    
+                    // FILTRO DE SEGURIDAD MEJORADO PARA LAS VIÑETAS
+                    let logrosArray = [];
+                    if (Array.isArray(exp.logros_y_responsabilidades) && exp.logros_y_responsabilidades.length > 0) {
+                        logrosArray = exp.logros_y_responsabilidades;
+                    } else if (typeof exp.logros_y_responsabilidades === 'string' && exp.logros_y_responsabilidades.trim() !== '') {
+                        logrosArray = exp.logros_y_responsabilidades.split(/[.,]/).filter(s => s.trim().length > 3);
+                    } else if (exp.descripcion) {
+                        logrosArray = [exp.descripcion];
+                    } else {
+                        logrosArray = ["Desarrollo y gestión de proyectos vinculados al área."]; // Texto por defecto si la IA falla
+                    }
+
+                    return `
+                    <div class="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-1.5 before:w-1.5 before:h-1.5 before:bg-indigo-600 before:rounded-full">
+                        <div class="flex justify-between items-baseline mb-1">
+                            <h5 class="text-sm font-black text-slate-800 uppercase tracking-tight">${exp.puesto || 'Puesto'}</h5>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase shrink-0 ml-2">${exp.periodo || ''}</span>
+                        </div>
+                        <div class="text-[11px] font-bold text-indigo-600 uppercase tracking-widest mb-2">${exp.empresa || 'Independiente'}</div>
+                        <ul class="text-[13px] text-slate-600 leading-relaxed list-disc list-outside ml-3 pr-2 space-y-1.5 break-words">
+                            ${logrosArray.map(logro => `<li>${logro.replace(/^,/, '').trim()}</li>`).join('')}
+                        </ul>
+                    </div>
+                    `
+                }).join('');
+            }
+            document.getElementById('previewExperience').innerHTML = expHtml;
+
+            document.getElementById('previewSkillsSection').classList.remove('hidden');
+            document.getElementById('atsBadge').classList.remove('hidden');
+            document.getElementById('atsBadge').classList.add('flex');
+            
+            const hardSkills = Array.isArray(cv.habilidades_tecnicas) ? cv.habilidades_tecnicas : [];
+            const softSkills = Array.isArray(cv.habilidades_blandas) ? cv.habilidades_blandas : [];
+
+            document.getElementById('previewHardSkills').innerHTML = hardSkills.map(skill => 
+                `<span class="text-[10px] font-bold text-indigo-700 bg-indigo-50/80 px-2.5 py-1 rounded-full border border-indigo-100/50 whitespace-normal text-center shadow-sm break-words">${skill}</span>`
+            ).join('');
+            
+            document.getElementById('previewSoftSkills').innerHTML = softSkills.map(skill => 
+                `<span class="text-[10px] font-medium text-slate-600 bg-white px-2.5 py-1 rounded-full border border-slate-200 shadow-sm whitespace-normal text-center break-words">${skill}</span>`
+            ).join('');
+        }
+    </script>
+</body>
+</html>
