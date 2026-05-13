@@ -212,7 +212,7 @@
             btnText.innerText = "Analizando y Optimizando...";
 
             try {
-                const response = await fetch('https://pleiadescv.onrender.com', {
+                const response = await fetch('https://pleiadescv.onrender.com/api/generar-cv', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ texto_desorganizado: texto })
